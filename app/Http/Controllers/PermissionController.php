@@ -43,9 +43,10 @@ class PermissionController extends Controller implements HasMiddleware
         return redirect()->route('permissions.index')->with('success', 'Permission created successfully.');
     }
 
-    public function show()
+    public function show(Permission $permission)
     {
-
+        $permission->load('roles');
+        return view('permissions.show', compact('permission'));
     }
 
     public function edit(Permission $permission)

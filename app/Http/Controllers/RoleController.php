@@ -60,9 +60,10 @@ class RoleController extends Controller implements HasMiddleware
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Role $role)
     {
-        //
+        $role->load('permissions', 'users');
+        return view('roles.show', compact('role'));
     }
 
     /**
