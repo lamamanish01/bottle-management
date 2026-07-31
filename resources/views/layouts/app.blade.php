@@ -34,21 +34,29 @@
                             <i class="fas fa-home"></i> Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('users.index') }}">
-                            <i class="fas fa-users"></i> Users
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('roles.index') }}">
-                            <i class="fas fa-user-tag"></i> Roles
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('permissions.index') }}">
-                            <i class="fas fa-lock"></i> Permissions
-                        </a>
-                    </li>
+                    @can('view users')
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('users.index') }}">
+                                <i class="fas fa-users-cog"></i> User Management
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('view roles')
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('roles.index') }}">
+                                <i class="fas fa-user-tag"></i> Roles & Permissions
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('view permissions')
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('permissions.index') }}">
+                                <i class="fas fa-lock"></i> Permission List
+                            </a>
+                        </li>
+                    @endcan
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('collections.index') }}">
                             <i class="fas fa-recycle"></i> Collections
