@@ -4,9 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Buyer;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class BuyerController extends Controller
+class BuyerController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:view buyers', only: ['index', 'show']),
+            new Middleware('permission:create buyers', only: ['create', 'store']),
+            new Middleware('permission:edit buyers', only: ['edit', 'update']),
+            new Middleware('permission:delete buyers', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the buyers.
      */

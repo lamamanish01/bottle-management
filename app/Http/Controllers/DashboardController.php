@@ -10,9 +10,18 @@ use App\Models\Collector;
 use App\Models\Buyer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:view dashboard', only: ['index']),
+        ];
+    }
+
     public function index()
     {
         // Basic stats

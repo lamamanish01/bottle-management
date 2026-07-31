@@ -6,9 +6,21 @@ use App\Models\Payment;
 use App\Models\Collection;
 use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PaymentController extends Controller
+class PaymentController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:view payments', only: ['index', 'show']),
+            new Middleware('permission:create payments', only: ['create', 'store']),
+            new Middleware('permission:edit payments', only: ['edit', 'update']),
+            new Middleware('permission:delete payments', only: ['destroy']),
+        ];
+    }
+
     public function index()
     {
         $payments = Payment::with(['payable'])->latest()->paginate(15);

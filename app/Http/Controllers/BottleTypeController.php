@@ -4,9 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\BottleType;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class BottleTypeController extends Controller
+class BottleTypeController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:view bottle-types', only: ['index', 'show']),
+            new Middleware('permission:create bottle-types', only: ['create', 'store']),
+            new Middleware('permission:edit bottle-types', only: ['edit', 'update']),
+            new Middleware('permission:delete bottle-types', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the bottle types.
      */

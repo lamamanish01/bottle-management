@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Add User')
+@section('title', 'Create User')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-user-plus me-2"></i>Add User</h1>
+    <h1><i class="fas fa-user-plus me-2"></i>Create User</h1>
     <a href="{{ route('users.index') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left me-1"></i> Back
     </a>
@@ -38,9 +38,9 @@
                     <label for="role" class="form-label fw-bold">Role <span class="text-danger">*</span></label>
                     <select class="form-select @error('role') is-invalid @enderror" id="role" name="role" required>
                         <option value="">Select Role</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="manager" {{ old('role') == 'manager' ? 'selected' : '' }}>Manager</option>
-                        <option value="viewer" {{ old('role') == 'viewer' ? 'selected' : '' }}>Viewer</option>
+                        @foreach($roles as $role)
+                            <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>{{ $role->name }}</option>
+                        @endforeach
                     </select>
                     @error('role') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>

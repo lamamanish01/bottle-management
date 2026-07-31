@@ -18,6 +18,7 @@
                         <th>Related To</th>
                         <th>Amount</th>
                         <th>Reference</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,11 +40,27 @@
                             </td>
                             <td>NPR {{ number_format($payment->amount, 2) }}</td>
                             <td>{{ $payment->reference ?? '—' }}</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    @can('view payments')
+                                        <a href="{{ route('payments.show', $payment) }}" class="btn btn-outline-info" title="View"><i class="fas fa-eye"></i></a>
+                                    @endcan
+                                    @can('edit payments')
+                                        <a href="{{ route('payments.edit', $payment) }}" class="btn btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></a>
+                                    @endcan
+                                    @can('delete payments')
+                                        <form action="{{ route('payments.destroy', $payment) }}" method="POST" style="display:inline-block;">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete" onclick="return confirm('Are you sure?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endcan
+                                </div>
+                            </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="6" class="text-center text-muted py-3">No payments recorded.</td>
-                        </tr>
+                        <tr><td colspan="7" class="text-center text-muted py-3">No payments recorded.</td></tr>
                     @endforelse
                 </tbody>
             </table>

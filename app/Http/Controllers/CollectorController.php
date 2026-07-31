@@ -4,9 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Collector;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class CollectorController extends Controller
+class CollectorController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:view collectors', only: ['index', 'show']),
+            new Middleware('permission:create collectors', only: ['create', 'store']),
+            new Middleware('permission:edit collectors', only: ['edit', 'update']),
+            new Middleware('permission:delete collectors', only: ['destroy']),
+        ];
+    }
+
     public function index()
     {
         $collectors = Collector::latest()->paginate(10);

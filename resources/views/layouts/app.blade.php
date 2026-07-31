@@ -40,6 +40,16 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('roles.index') }}">
+                            <i class="fas fa-user-tag"></i> Roles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('permissions.index') }}">
+                            <i class="fas fa-lock"></i> Permissions
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('collections.index') }}">
                             <i class="fas fa-recycle"></i> Collections
                         </a>

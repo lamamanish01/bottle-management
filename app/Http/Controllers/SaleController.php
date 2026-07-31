@@ -8,9 +8,21 @@ use App\Models\BottleType;
 use App\Models\Payment;
 use App\Http\Requests\StoreSaleRequest;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class SaleController extends Controller
+class SaleController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('permission:view sales', only: ['index', 'show']),
+            new Middleware('permission:create sales', only: ['create', 'store']),
+            new Middleware('permission:edit sales', only: ['edit', 'update']),
+            new Middleware('permission:delete sales', only: ['destroy']),
+        ];
+    }
+
     public function index()
     {
         $sales = Sale::with(['buyer', 'bottleType'])->latest()->paginate(15);
