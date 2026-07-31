@@ -13,26 +13,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('styles')
 
-    <!-- Optional: custom overrides for a more polished look -->
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+        }
         .navbar-brand { font-weight: 600; letter-spacing: -0.5px; }
         .nav-link i { margin-right: 6px; width: 1.2em; text-align: center; }
         .dropdown-item i { width: 1.8em; }
-        .flash-message { animation: fadeInDown 0.3s ease; }
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .footer {
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 1rem 0;
+            margin-top: auto;
         }
-        /* Sticky footer (optional) */
-        main { min-height: 80vh; }
+        .footer a { color: #6c757d; text-decoration: none; }
+        .footer a:hover { color: #0d6efd; text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <!-- Fixed top navbar for better navigation -->
+    <!-- Navbar (sticky-top) -->
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{{ route('dashboard') }}">
@@ -55,7 +65,7 @@
                         </a>
                     </li>
 
-                    {{-- Administration dropdown (only for users with proper permissions) --}}
+                    {{-- Administration dropdown --}}
                     @canany(['view users', 'view roles', 'view permissions'])
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle {{ request()->routeIs('users.*') || request()->routeIs('roles.*') || request()->routeIs('permissions.*') ? 'active' : '' }}"
@@ -167,9 +177,6 @@
                                 <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
-                                {{-- Optional: profile link --}}
-                                {{-- <a class="dropdown-item" href="#"><i class="fas fa-user"></i> Profile</a> --}}
-                                {{-- <div class="dropdown-divider"></div> --}}
                                 <a class="dropdown-item text-danger" href="{{ route('logout') }}"
                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -188,62 +195,93 @@
     <!-- Main content -->
     <main class="py-4">
         <div class="container">
-            <!-- Flash Messages with auto-dismiss and improved styling -->
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show flash-message" role="alert">
-                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show flash-message" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show flash-message" role="alert">
-                    <i class="fas fa-times-circle me-2"></i> Please fix the following errors:
-                    <ul class="mb-0 mt-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            <!-- Page content -->
+            <!-- Flash messages are now displayed via SweetAlert toasts -->
             @yield('content')
         </div>
     </main>
 
-    <!-- Optional footer (uncomment if needed) -->
-    {{-- <footer class="bg-white border-top py-3 mt-auto">
-        <div class="container text-center text-muted small">
-            &copy; {{ date('Y') }} Bottle Management – Built with ♥
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <span class="text-muted">
+                &copy; {{ date('Y') }} <a href="{{ route('dashboard') }}">SyncInfotech Pvt. Ltd.</a>.
+                Built with <i class="fas fa-heart text-danger"></i> using Laravel & Bootstrap.
+            </span>
+            {{--  <span class="text-muted ms-3">
+                <a href="#" onclick="event.preventDefault();">Privacy</a> &middot;
+                <a href="#" onclick="event.preventDefault();">Terms</a>
+            </span>  --}}
         </div>
-    </footer> --}}
+    </footer>
 
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     @stack('scripts')
 
-    <!-- Auto-dismiss flash messages after 5 seconds (optional) -->
+    <!-- SweetAlert Flash Messages Handler -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(function () {
-                const alerts = document.querySelectorAll('.alert-dismissible');
-                alerts.forEach(function (alert) {
-                    const closeBtn = alert.querySelector('.btn-close');
-                    if (closeBtn) {
-                        closeBtn.click();
+            // Handle Laravel flash messages from session
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    timer: 4000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            @endif
+
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    timer: 5000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            @endif
+
+            @if ($errors->any())
+                let errorMessages = '';
+                @foreach ($errors->all() as $error)
+                    errorMessages += '• {{ $error }}\n';
+                @endforeach
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: errorMessages,
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Got it!'
+                });
+            @endif
+
+            // Optional: Add a global confirmation helper for delete actions
+            window.confirmDelete = function (message, url, method = 'DELETE') {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: message || "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        let form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = url;
+                        form.innerHTML = `@csrf @method('${method}')`;
+                        document.body.appendChild(form);
+                        form.submit();
                     }
                 });
-            }, 5000);
+            };
         });
     </script>
 </body>

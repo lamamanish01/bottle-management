@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller implements HasMiddleware
 {
@@ -28,7 +29,8 @@ class UserController extends Controller implements HasMiddleware
 
     public function create()
     {
-        return view('users.create');
+        $roles = Role::all();
+        return view('users.create', compact('roles'));
     }
 
     public function store(Request $request)
@@ -36,12 +38,18 @@ class UserController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
-            'role'     => 'required|in:admin,manager,viewer',
+            'password' => 'required|confirmed|min:8',
+            // 👇 This is the key fix: check the 'name' column, not the 'id'
+            'role'     => 'required|exists:roles,name',
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
-        User::create($validated);
+        $user = User::create([
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        $user->assignRole($validated['role']);
 
         return redirect()->route('users.index')
                          ->with('success', 'User created successfully.');
