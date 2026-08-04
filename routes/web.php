@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
         'payments' => PaymentController::class,
         'roles' => RoleController::class,
         'permissions' => PermissionController::class,
+        'suppliers' => SupplierController::class,
         // 'expenses' => ExpenseController::class,
     ]);
 });

@@ -11,9 +11,6 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
 
-            // ================= dashboard =================
-            'view dashboard',
-
             // ================= USERS =================
             'view users',
             'create users',
@@ -37,6 +34,12 @@ class PermissionSeeder extends Seeder
             'create collectors',
             'edit collectors',
             'delete collectors',
+
+            // ================= SUPPLIERS =================  <-- new
+            'view suppliers',
+            'create suppliers',
+            'edit suppliers',
+            'delete suppliers',
 
             // ================= BUYERS =================
             'view buyers',

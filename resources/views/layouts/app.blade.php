@@ -38,6 +38,31 @@
         }
         .footer a { color: #6c757d; text-decoration: none; }
         .footer a:hover { color: #0d6efd; text-decoration: underline; }
+
+        /* SweetAlert2 custom styles */
+        .swal2-popup {
+            border-radius: 20px !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2) !important;
+        }
+        .swal2-title {
+            font-weight: 600 !important;
+        }
+        .swal2-confirm {
+            border-radius: 50px !important;
+            padding: 10px 30px !important;
+        }
+        .swal2-cancel {
+            border-radius: 50px !important;
+            padding: 10px 30px !important;
+        }
+        .swal2-toast {
+            border-radius: 50px !important;
+            padding: 12px 20px !important;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1) !important;
+        }
+        .swal2-toast .swal2-title {
+            font-size: 1rem !important;
+        }
     </style>
 </head>
 <body>
@@ -130,9 +155,9 @@
                     @endcanany
 
                     {{-- Master Data dropdown --}}
-                    @canany(['view collectors', 'view buyers', 'view bottle-types'])
+                    @canany(['view collectors', 'view buyers', 'view bottle-types', 'view suppliers'])
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {{ request()->routeIs('collectors.*') || request()->routeIs('buyers.*') || request()->routeIs('bottle-types.*') ? 'active' : '' }}"
+                            <a class="nav-link dropdown-toggle {{ request()->routeIs('collectors.*') || request()->routeIs('buyers.*') || request()->routeIs('bottle-types.*') || request()->routeIs('suppliers.*') ? 'active' : '' }}"
                                href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-database"></i> Master Data
                             </a>
@@ -142,6 +167,14 @@
                                         <a class="dropdown-item {{ request()->routeIs('collectors.*') ? 'active' : '' }}"
                                            href="{{ route('collectors.index') }}">
                                             <i class="fas fa-users"></i> Collectors
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('view suppliers')
+                                    <li>
+                                        <a class="dropdown-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}"
+                                           href="{{ route('suppliers.index') }}">
+                                            <i class="fas fa-truck"></i> Suppliers
                                         </a>
                                     </li>
                                 @endcan
@@ -195,7 +228,6 @@
     <!-- Main content -->
     <main class="py-4">
         <div class="container">
-            <!-- Flash messages are now displayed via SweetAlert toasts -->
             @yield('content')
         </div>
     </main>
@@ -207,10 +239,6 @@
                 &copy; {{ date('Y') }} <a href="{{ route('dashboard') }}">SyncInfotech Pvt. Ltd.</a>.
                 Built with <i class="fas fa-heart text-danger"></i> using Laravel & Bootstrap.
             </span>
-            {{--  <span class="text-muted ms-3">
-                <a href="#" onclick="event.preventDefault();">Privacy</a> &middot;
-                <a href="#" onclick="event.preventDefault();">Terms</a>
-            </span>  --}}
         </div>
     </footer>
 
@@ -219,49 +247,66 @@
 
     @stack('scripts')
 
-    <!-- SweetAlert Flash Messages Handler -->
+    <!-- Enhanced SweetAlert2 Integration -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Handle Laravel flash messages from session
+            // ---------- Toast Mixin ----------
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
+
+            // ---------- Success Flash ----------
             @if (session('success'))
-                Swal.fire({
+                Toast.fire({
                     icon: 'success',
-                    title: 'Success!',
-                    text: '{{ session('success') }}',
-                    timer: 4000,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end'
+                    title: '{{ session('success') }}',
+                    customClass: {
+                        popup: 'swal2-toast'
+                    }
                 });
             @endif
 
+            // ---------- Error Flash ----------
             @if (session('error'))
-                Swal.fire({
+                Toast.fire({
                     icon: 'error',
-                    title: 'Error!',
-                    text: '{{ session('error') }}',
-                    timer: 5000,
-                    showConfirmButton: false,
-                    toast: true,
-                    position: 'top-end'
+                    title: '{{ session('error') }}',
+                    customClass: {
+                        popup: 'swal2-toast'
+                    }
                 });
             @endif
 
+            // ---------- Validation Errors (Modal) ----------
             @if ($errors->any())
-                let errorMessages = '';
+                let errorHtml = '<ul style="text-align:left; list-style:none; padding-left:0;">';
                 @foreach ($errors->all() as $error)
-                    errorMessages += '• {{ $error }}\n';
+                    errorHtml += '<li><i class="fas fa-times-circle text-danger me-2"></i>{{ $error }}</li>';
                 @endforeach
+                errorHtml += '</ul>';
+
                 Swal.fire({
                     icon: 'error',
-                    title: 'Validation Error',
-                    text: errorMessages,
+                    title: 'Validation Failed',
+                    html: errorHtml,
+                    confirmButtonText: 'Got it!',
                     confirmButtonColor: '#d33',
-                    confirmButtonText: 'Got it!'
+                    customClass: {
+                        popup: 'swal2-popup',
+                        confirmButton: 'btn btn-danger'
+                    }
                 });
             @endif
 
-            // Optional: Add a global confirmation helper for delete actions
+            // ---------- Global Delete Confirmation ----------
             window.confirmDelete = function (message, url, method = 'DELETE') {
                 Swal.fire({
                     title: 'Are you sure?',
@@ -270,7 +315,14 @@
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, delete it!'
+                    confirmButtonText: '<i class="fas fa-trash me-1"></i> Yes, delete it!',
+                    cancelButtonText: '<i class="fas fa-times me-1"></i> Cancel',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: 'swal2-popup',
+                        confirmButton: 'btn btn-danger px-4',
+                        cancelButton: 'btn btn-secondary px-4'
+                    }
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let form = document.createElement('form');
@@ -286,3 +338,4 @@
     </script>
 </body>
 </html>
+ 

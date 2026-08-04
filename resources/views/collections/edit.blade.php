@@ -15,10 +15,10 @@
         <form method="POST" action="{{ route('collections.update', $collection) }}">
             @csrf @method('PUT')
             <div class="row">
-                <!-- Collector -->
+                <!-- Collector Dropdown -->
                 <div class="col-md-6 mb-3">
-                    <label for="collector_id" class="form-label fw-bold">Collector <span class="text-danger">*</span></label>
-                    <select class="form-select @error('collector_id') is-invalid @enderror" id="collector_id" name="collector_id" required>
+                    <label for="collector_id" class="form-label fw-bold">Collector</label>
+                    <select class="form-select @error('collector_id') is-invalid @enderror" id="collector_id" name="collector_id">
                         <option value="">Select Collector</option>
                         @foreach ($collectors as $collector)
                             <option value="{{ $collector->id }}" {{ old('collector_id', $collection->collector_id) == $collector->id ? 'selected' : '' }}>
@@ -27,6 +27,22 @@
                         @endforeach
                     </select>
                     @error('collector_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <small class="text-muted">Optional if you select a Supplier below</small>
+                </div>
+
+                <!-- Supplier Dropdown -->
+                <div class="col-md-6 mb-3">
+                    <label for="supplier_id" class="form-label fw-bold">Supplier</label>
+                    <select class="form-select @error('supplier_id') is-invalid @enderror" id="supplier_id" name="supplier_id">
+                        <option value="">Select Supplier</option>
+                        @foreach ($suppliers as $supplier)
+                            <option value="{{ $supplier->id }}" {{ old('supplier_id', $collection->supplier_id) == $supplier->id ? 'selected' : '' }}>
+                                {{ $supplier->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('supplier_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <small class="text-muted">Optional if you select a Collector above</small>
                 </div>
 
                 <!-- Bottle Type -->
@@ -43,7 +59,7 @@
                     @error('bottle_type_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
-                <!-- Collection Date -->
+                <!-- Date -->
                 <div class="col-md-6 mb-3">
                     <label for="collection_date" class="form-label fw-bold">Date <span class="text-danger">*</span></label>
                     <input type="date" class="form-control @error('collection_date') is-invalid @enderror" id="collection_date" name="collection_date" value="{{ old('collection_date', $collection->collection_date) }}" required>
@@ -74,16 +90,18 @@
                         <span class="input-group-text">NPR</span>
                         <input type="text" class="form-control" id="total_price_display" value="{{ old('total_price', $collection->total_price) }}" readonly>
                     </div>
-                    <small class="text-muted">Quantity × Unit Price</small>
                     <input type="hidden" name="total_price" id="total_price" value="{{ old('total_price', $collection->total_price) }}">
                 </div>
 
-                <!-- Paid status -->
+                <!-- Paid -->
                 <div class="col-md-6 mb-3">
                     <div class="form-check mt-4">
-                        <input class="form-check-input" type="checkbox" id="paid" name="paid" value="1" {{ old('paid', $collection->paid) ? 'checked' : '' }}>
+                        <!-- Hidden input to send value when unchecked -->
+                        <input type="hidden" name="paid" value="0">
+                        <input class="form-check-input" type="checkbox" id="paid" name="paid" value="1"
+                            {{ old('paid', $collection->paid) ? 'checked' : '' }}>
                         <label class="form-check-label fw-bold" for="paid">
-                            <i class="fas fa-check-circle text-success me-1"></i> Paid to collector
+                            <i class="fas fa-check-circle text-success me-1"></i> Paid
                         </label>
                     </div>
                 </div>
