@@ -25,7 +25,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // If you want to link users to suppliers
     public function supplier()
     {
         return $this->hasOne(Supplier::class);
