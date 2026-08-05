@@ -23,7 +23,9 @@ class UserController extends Controller implements HasMiddleware
 
     public function index()
     {
-        $users = User::latest()->paginate(10);
+        $users = User::whereDoesntHave('roles', function ($query) {
+            $query->where('name', 'Super Admin');
+        })->paginate(10);
         return view('users.index', compact('users'));
     }
 
