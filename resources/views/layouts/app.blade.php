@@ -207,7 +207,7 @@
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                aria-expanded="false">
                                 <i class="fas fa-user-circle fa-lg"></i>
-                                <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
+                                <span class="d-inline-block">{{ Auth::user()->name }}</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a class="dropdown-item text-danger" href="{{ route('logout') }}"
@@ -338,4 +338,3 @@
     </script>
 </body>
 </html>
- 
