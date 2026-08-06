@@ -11,6 +11,9 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
 
+             // ================= USERS =================
+            'view dashboard',
+
             // ================= USERS =================
             'view users',
             'create users',
